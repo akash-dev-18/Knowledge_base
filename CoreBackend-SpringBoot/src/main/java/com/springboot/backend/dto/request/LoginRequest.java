@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 public class LoginRequest {
     @NotBlank(message = "email is required")
-    private String name;
+    private String email;
 
     @NotBlank(message = "Password is required")
     @Size(min = 8,message = "min 8 length password")
