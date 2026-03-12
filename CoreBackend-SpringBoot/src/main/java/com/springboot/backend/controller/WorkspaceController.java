@@ -42,7 +42,7 @@ public class WorkspaceController {
     public ResponseEntity<List<WorkspaceResponse>> getAll() {
         User currentUser = securityUtils.getCurrentUser();
         return ResponseEntity.ok(
-                workspaceService.getAllByCompany(currentUser.getCompany().getId())
+                workspaceService.getAllForUser(currentUser)
         );
     }
 

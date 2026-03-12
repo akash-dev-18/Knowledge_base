@@ -25,8 +25,14 @@ public class FileStorageService {
             }
 
 
-            String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
-            Path filePath = uploadPath.resolve(fileName);
+           
+        String originalFilename = file.getOriginalFilename();
+        String extension = "";
+        if (originalFilename != null && originalFilename.contains(".")) {
+            extension = originalFilename.substring(originalFilename.lastIndexOf("."));
+        }
+        String fileName = UUID.randomUUID() + extension;
+        Path filePath = uploadPath.resolve(fileName);
 
 
             Files.copy(file.getInputStream(), filePath);

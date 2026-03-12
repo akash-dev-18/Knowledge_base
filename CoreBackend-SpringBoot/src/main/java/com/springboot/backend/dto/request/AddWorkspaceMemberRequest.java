@@ -14,5 +14,5 @@ public class AddWorkspaceMemberRequest {
     private UUID userId;
 
     @NotNull(message = "Role name is required")
-    private UUID roleName;
+    private String roleName;
 }

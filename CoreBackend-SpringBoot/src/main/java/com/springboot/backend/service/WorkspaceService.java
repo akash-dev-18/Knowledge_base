@@ -69,16 +69,30 @@ public class WorkspaceService {
         return workspaceMapper.toResponse(workspace);
     }
 
-    public List<WorkspaceResponse> getAllByCompany(UUID companyId) {
-        securityUtils.requireRole("OWNER", "ADMIN");
-        return workspaceRepository.findByCompanyId(companyId)
-                .stream()
-                .map(workspaceMapper::toResponse)
-                .toList();
+    public List<WorkspaceResponse> getAllForUser(User currentUser) {
+        String roleName = currentUser.getRole().getName();
+        if ("OWNER".equals(roleName) || "ADMIN".equals(roleName)) {
+            return workspaceRepository.findByCompanyId(currentUser.getCompany().getId())
+                    .stream()
+                    .map(workspaceMapper::toResponse)
+                    .toList();
+        } else {
+            return workspaceUserRepository.findByUserId(currentUser.getId())
+                    .stream()
+                    .map(WorkspaceUser::getWorkspace)
+                    .map(workspaceMapper::toResponse)
+                    .toList();
+        }
     }
 
     public WorkspaceResponse getById(UUID id) {
-        securityUtils.requireRole("OWNER", "ADMIN");
+        User currentUser = securityUtils.getCurrentUser();
+        String roleName = currentUser.getRole().getName();
+        if (!"OWNER".equals(roleName) && !"ADMIN".equals(roleName)) {
+            if (!workspaceUserRepository.existsByUserIdAndWorkspaceId(currentUser.getId(), id)) {
+                throw new RuntimeException("Access denied to this workspace");
+            }
+        }
         Workspace workspace = workspaceRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Workspace not found: " + id));
         return workspaceMapper.toResponse(workspace);
@@ -147,7 +161,13 @@ public class WorkspaceService {
     }
 
     public List<WorkspaceUserResponse> getMembers(UUID workspaceId) {
-        securityUtils.requireRole("OWNER", "ADMIN");
+        User currentUser = securityUtils.getCurrentUser();
+        String roleName = currentUser.getRole().getName();
+        if (!"OWNER".equals(roleName) && !"ADMIN".equals(roleName)) {
+            if (!workspaceUserRepository.existsByUserIdAndWorkspaceId(currentUser.getId(), workspaceId)) {
+                throw new RuntimeException("Access denied to this workspace");
+            }
+        }
         return workspaceUserRepository.findByWorkspaceId(workspaceId)
                 .stream()
                 .map(workspaceUserMapper::toResponse)

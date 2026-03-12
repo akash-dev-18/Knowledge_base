@@ -1,0 +1,84 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: knowledge-postgres
+    environment:
+      POSTGRES_USER: akash
+      POSTGRES_PASSWORD: akash
+      POSTGRES_DB: akash
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U akash -d akash"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: knowledge-redis
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  qdrant:
+    image: qdrant/qdrant:latest
+    container_name: knowledge-qdrant
+    ports:
+      - "6333:6333"
+
+  springboot-backend:
+    build:
+      context: ./CoreBackend-SpringBoot
+    container_name: knowledge-springboot
+    ports:
+      - "8080:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/akash
+      - FASTAPI_URL=http://fastapi-backend:8000
+
+  fastapi-backend:
+    build:
+      context: ./fastapi-ai-services
+    container_name: knowledge-fastapi
+    ports:
+      - "8000:8000"
+    depends_on:
+      redis:
+        condition: service_healthy
+      qdrant:
+        condition: service_started
+    environment:
+      - REDIS_URL=redis://redis:6379
+      - QDRANT_URL=http://qdrant:6333
+      - SPRING_BOOT_URL=http://springboot-backend:8080
+    env_file:
+      - ./fastapi-ai-services/.env  # Mounts your OPENROUTER keys
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: knowledge-frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - springboot-backend
+      - fastapi-backend
+    environment:
+      # These must be accessible by Next.js browser execution, so we use localhost
+      - NEXT_PUBLIC_SPRING_URL=http://localhost:8080
+      - NEXT_PUBLIC_FASTAPI_URL=http://localhost:8000
+
+volumes:
+  postgres_data:

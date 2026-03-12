@@ -1,5 +1,6 @@
 package com.springboot.backend.controller;
 
+import com.springboot.backend.dto.request.InviteRequest;
 import com.springboot.backend.dto.request.LoginRequest;
 import com.springboot.backend.dto.request.RegisterRequest;
 import com.springboot.backend.dto.response.AuthResponse;
@@ -16,6 +17,12 @@ public class AuthController {
 
     private final AuthService authService;
 
+@PostMapping("/invite")
+public ResponseEntity<AuthResponse> invite(
+    @Valid @RequestBody InviteRequest request
+) {
+    return ResponseEntity.status(201).body(authService.invite(request));
+}
     @PostMapping("/register")
     public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest request) {
         return ResponseEntity.status(201).body(authService.register(request));

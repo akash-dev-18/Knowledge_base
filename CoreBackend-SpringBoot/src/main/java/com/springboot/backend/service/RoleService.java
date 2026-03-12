@@ -33,6 +33,6 @@ public class RoleService {
 
     public Role findByNameAndCompanyOrThrow(String name, UUID companyId) {
         return roleRepository.findByNameAndCompanyId(name, companyId)
-                .orElseThrow(() -> new RuntimeException("Role not found: " + name));
+                .orElseGet(() -> create(name, companyId));
     }
 }
