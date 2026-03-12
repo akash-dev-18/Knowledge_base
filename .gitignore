@@ -1,0 +1,55 @@
+# ==========================================
+# Spring Boot
+# ==========================================
+CoreBackend-SpringBoot/target/
+CoreBackend-SpringBoot/.mvn/
+CoreBackend-SpringBoot/*.jar
+CoreBackend-SpringBoot/*.war
+CoreBackend-SpringBoot/uploads/
+
+# Spring Boot config
+CoreBackend-SpringBoot/src/main/resources/application.properties
+CoreBackend-SpringBoot/src/main/resources/application-prod.properties
+CoreBackend-SpringBoot/src/main/resources/application-dev.properties
+
+# ==========================================
+# FastAPI
+# ==========================================
+fastapi-service/.env
+fastapi-service/__pycache__/
+fastapi-service/**/__pycache__/
+fastapi-service/*.pyc
+fastapi-service/.venv/
+fastapi-service/venv/
+fastapi-service/uploads/
+
+# ==========================================
+# Frontend
+# ==========================================
+frontend/.env.local
+frontend/.env.production
+frontend/.env
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+
+# ==========================================
+# IDE
+# ==========================================
+.idea/
+.vscode/
+*.iml
+*.iws
+*.ipr
+
+# ==========================================
+# OS
+# ==========================================
+.DS_Store
+Thumbs.db
+
+# ==========================================
+# Logs
+# ==========================================
+*.log
+logs/
