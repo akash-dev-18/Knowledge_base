@@ -1,37 +1,42 @@
 # ==========================================
-# Spring Boot
+# Spring Boot — CoreBackend-SpringBoot
 # ==========================================
 CoreBackend-SpringBoot/target/
-CoreBackend-SpringBoot/.mvn/
-CoreBackend-SpringBoot/*.jar
-CoreBackend-SpringBoot/*.war
 CoreBackend-SpringBoot/uploads/
-
-# Spring Boot config
 CoreBackend-SpringBoot/src/main/resources/application.properties
 CoreBackend-SpringBoot/src/main/resources/application-prod.properties
 CoreBackend-SpringBoot/src/main/resources/application-dev.properties
+CoreBackend-SpringBoot/.mvn/wrapper/maven-wrapper.jar
+CoreBackend-SpringBoot/*.jar
+CoreBackend-SpringBoot/*.war
 
 # ==========================================
-# FastAPI
+# FastAPI — fastapi-ai-services
 # ==========================================
-fastapi-service/.env
-fastapi-service/__pycache__/
-fastapi-service/**/__pycache__/
-fastapi-service/*.pyc
-fastapi-service/.venv/
-fastapi-service/venv/
-fastapi-service/uploads/
+fastapi-ai-services/.env
+fastapi-ai-services/__pycache__/
+fastapi-ai-services/**/__pycache__/
+fastapi-ai-services/**/*.pyc
+fastapi-ai-services/.venv/
+fastapi-ai-services/venv/
+fastapi-ai-services/uploads/
 
 # ==========================================
 # Frontend
 # ==========================================
+frontend/.env
 frontend/.env.local
 frontend/.env.production
-frontend/.env
 frontend/node_modules/
 frontend/.next/
 frontend/out/
+
+# ==========================================
+# Root level
+# ==========================================
+.env
+test.sh
+test2.sh
 
 # ==========================================
 # IDE
