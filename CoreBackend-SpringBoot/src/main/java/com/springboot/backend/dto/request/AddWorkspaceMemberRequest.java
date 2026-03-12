@@ -13,6 +13,6 @@ public class AddWorkspaceMemberRequest {
     @NotNull(message = "User id is required")
     private UUID userId;
 
-    @NotNull(message = "Role id is required")
-    private UUID roleId;
+    @NotNull(message = "Role name is required")
+    private UUID roleName;
 }

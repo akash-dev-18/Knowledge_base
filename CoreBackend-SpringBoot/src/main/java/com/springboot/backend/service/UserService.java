@@ -5,6 +5,7 @@ import com.springboot.backend.dto.response.UserResponse;
 import com.springboot.backend.entity.User;
 import com.springboot.backend.mapper.UserMapper;
 import com.springboot.backend.repository.UserRepository;
+import com.springboot.backend.util.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +21,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final SecurityUtils securityUtils;
 
 
     public UserResponse getById(UUID id){
@@ -47,6 +49,7 @@ public class UserService {
 
     @Transactional
     public void delete(UUID id) {
+        securityUtils.requireRole("OWNER","ADMIN");
         User user = userRepository.findById(id).orElseThrow(()-> new RuntimeException("User not found"));
         userRepository.deleteById(id);
     }

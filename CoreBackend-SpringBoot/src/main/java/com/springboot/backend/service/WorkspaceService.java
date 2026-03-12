@@ -12,6 +12,7 @@ import com.springboot.backend.repository.CompanyRepository;
 import com.springboot.backend.repository.UserRepository;
 import com.springboot.backend.repository.WorkspaceRepository;
 import com.springboot.backend.repository.WorkspaceUserRepository;
+import com.springboot.backend.util.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,9 +33,11 @@ public class WorkspaceService {
     private final RoleService roleService;
     private final CompanyService companyService;
     private final CompanyRepository companyRepository;
+    private final SecurityUtils securityUtils;
 
     @Transactional
     public WorkspaceResponse create(CreateWorkspaceRequest request, UUID companyId, UUID userId) {
+        securityUtils.requireRole("OWNER", "ADMIN");
         Company company = companyRepository.findById(companyId)
                 .orElseThrow(() -> new RuntimeException("Company not found: " + companyId));
 
@@ -67,6 +70,7 @@ public class WorkspaceService {
     }
 
     public List<WorkspaceResponse> getAllByCompany(UUID companyId) {
+        securityUtils.requireRole("OWNER", "ADMIN");
         return workspaceRepository.findByCompanyId(companyId)
                 .stream()
                 .map(workspaceMapper::toResponse)
@@ -74,6 +78,7 @@ public class WorkspaceService {
     }
 
     public WorkspaceResponse getById(UUID id) {
+        securityUtils.requireRole("OWNER", "ADMIN");
         Workspace workspace = workspaceRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Workspace not found: " + id));
         return workspaceMapper.toResponse(workspace);
@@ -81,6 +86,7 @@ public class WorkspaceService {
 
     @Transactional
     public WorkspaceResponse update(UUID id, UpdateWorkspaceRequest request) {
+        securityUtils.requireRole("OWNER", "ADMIN");
         Workspace workspace = workspaceRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Workspace not found: " + id));
 
@@ -96,6 +102,7 @@ public class WorkspaceService {
 
     @Transactional
     public void delete(UUID id) {
+        securityUtils.requireRole("OWNER", "ADMIN");
         Workspace workspace = workspaceRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Workspace not found: " + id));
         workspaceRepository.delete(workspace);
@@ -103,17 +110,21 @@ public class WorkspaceService {
 
     @Transactional
     public WorkspaceUserResponse addMember(UUID workspaceId, AddWorkspaceMemberRequest request, UUID companyId) {
+        securityUtils.requireRole("OWNER", "ADMIN");
+        securityUtils.requireRole("OWNER", "ADMIN");
+
         if (workspaceUserRepository.existsByUserIdAndWorkspaceId(request.getUserId(), workspaceId)) {
             throw new RuntimeException("User already a member");
         }
 
         Workspace workspace = workspaceRepository.findById(workspaceId)
-                .orElseThrow(() -> new RuntimeException("Workspace not found: " + workspaceId));
+                .orElseThrow(() -> new RuntimeException("Workspace not found"));
 
         User user = userRepository.findById(request.getUserId())
-                .orElseThrow(() -> new RuntimeException("User not found: " + request.getUserId()));
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
-        Role role = roleService.findByNameAndCompanyOrThrow("MEMBER", companyId);
+
+        Role role = roleService.findByNameAndCompanyOrThrow(String.valueOf(request.getRoleName()), companyId);
 
         WorkspaceUser member = workspaceUserRepository.save(
                 WorkspaceUser.builder()
@@ -128,6 +139,7 @@ public class WorkspaceService {
 
     @Transactional
     public void removeMember(UUID workspaceId, UUID userId) {
+        securityUtils.requireRole("OWNER", "ADMIN");
         WorkspaceUser member = workspaceUserRepository
                 .findByUserIdAndWorkspaceId(userId, workspaceId)
                 .orElseThrow(() -> new RuntimeException("Member not found"));
@@ -135,6 +147,7 @@ public class WorkspaceService {
     }
 
     public List<WorkspaceUserResponse> getMembers(UUID workspaceId) {
+        securityUtils.requireRole("OWNER", "ADMIN");
         return workspaceUserRepository.findByWorkspaceId(workspaceId)
                 .stream()
                 .map(workspaceUserMapper::toResponse)
@@ -142,7 +155,25 @@ public class WorkspaceService {
     }
 
     public Workspace findByIdOrThrow(UUID id) {
+        securityUtils.requireRole("OWNER", "ADMIN");
         return workspaceRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Workspace not found: " + id));
+    }
+
+
+
+    @Transactional
+    public WorkspaceUserResponse updateMemberRole(
+            UUID workspaceId, UUID userId, String roleName, UUID companyId) {
+        securityUtils.requireRole("OWNER", "ADMIN");
+
+        WorkspaceUser member = workspaceUserRepository
+                .findByUserIdAndWorkspaceId(userId, workspaceId)
+                .orElseThrow(() -> new RuntimeException("Member not found"));
+
+        Role role = roleService.findByNameAndCompanyOrThrow(roleName, companyId);
+        member.setRole(role);
+
+        return workspaceUserMapper.toResponse(member);
     }
 }

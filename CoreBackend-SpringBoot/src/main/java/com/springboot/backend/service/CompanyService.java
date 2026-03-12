@@ -6,6 +6,7 @@ import com.springboot.backend.dto.response.CompanyResponse;
 import com.springboot.backend.entity.Company;
 import com.springboot.backend.mapper.CompanyMapper;
 import com.springboot.backend.repository.CompanyRepository;
+import com.springboot.backend.util.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,7 +19,7 @@ import java.util.UUID;
 public class CompanyService {
     private final CompanyRepository companyRepository;
     private final CompanyMapper companyMapper;
-
+    private final SecurityUtils securityUtils;
 
     @Transactional
     public Company create(String name ,String description){
@@ -33,6 +34,7 @@ public class CompanyService {
 
     @Transactional
     public CompanyResponse update(UUID id, UpdateCompanyRequest request){
+        securityUtils.requireRole("OWNER", "ADMIN");
         Company company=companyRepository.findById(id).orElseThrow(()-> new RuntimeException("Company not exists."));
 
         if (request.getName()!=null){
@@ -51,6 +53,7 @@ public class CompanyService {
 
     @Transactional
     public void delete(UUID id){
+        securityUtils.requireRole("OWNER");
         Company company=companyRepository.findById(id).orElseThrow(()-> new RuntimeException("Company does not exist."));
         companyRepository.deleteById(id) ;
     }

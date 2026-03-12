@@ -1,6 +1,5 @@
 package com.springboot.backend.service;
 
-import com.springboot.backend.dto.request.UploadDocumentRequest;
 import com.springboot.backend.dto.response.DocumentResponse;
 import com.springboot.backend.entity.Document;
 import com.springboot.backend.entity.User;
@@ -8,9 +7,13 @@ import com.springboot.backend.entity.Workspace;
 import com.springboot.backend.enums.DocumentStatus;
 import com.springboot.backend.mapper.DocumentMapper;
 import com.springboot.backend.repository.DocumentRepository;
+import com.springboot.backend.repository.UserRepository;
+import com.springboot.backend.repository.WorkspaceRepository;
+import com.springboot.backend.util.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.UUID;
@@ -20,25 +23,29 @@ import java.util.UUID;
 @Transactional(readOnly = true)
 public class DocumentService {
 
+    private final FileStorageService fileStorageService;
+    private final WorkspaceRepository workspaceRepository;
+    private final UserRepository userRepository;
     private final DocumentRepository documentRepository;
     private final DocumentMapper documentMapper;
-    private final WorkspaceService workspaceService;
-    private final UserService userService;
+    private final SecurityUtils securityUtils;
 
     @Transactional
-    public DocumentResponse upload(UploadDocumentRequest request, UUID userId) {
-        Workspace workspace = workspaceService.findByIdOrThrow(request.getWorkspaceId());
-        User user = userService.findByIdOrThrow(userId);
+    public DocumentResponse upload(MultipartFile file, UUID workspaceId, UUID userId) {
+        securityUtils.requireRole("OWNER", "ADMIN", "MEMBER");
+        Workspace workspace = workspaceRepository.findById(workspaceId)
+                .orElseThrow(() -> new RuntimeException("Workspace not found"));
 
-        if (documentRepository.existsByFilePath(request.getFilePath())) {
-            throw new RuntimeException("Document already exists: " + request.getFilePath());
-        }
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        String filePath = fileStorageService.save(file);
 
         Document document = documentRepository.save(
                 Document.builder()
-                        .fileName(request.getFileName())
-                        .filePath(request.getFilePath())
-                        .fileSize(request.getFileSize())
+                        .fileName(file.getOriginalFilename())
+                        .filePath(filePath)
+                        .fileSize(file.getSize())
                         .workspace(workspace)
                         .user(user)
                         .status(DocumentStatus.UPLOADING)
@@ -71,13 +78,10 @@ public class DocumentService {
 
     @Transactional
     public void delete(UUID id) {
+        securityUtils.requireRole("OWNER", "ADMIN", "MEMBER");
         Document document = documentRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Document not found: " + id));
+                .orElseThrow(() -> new RuntimeException("Document not found"));
         documentRepository.delete(document);
-    }
-
-    public Document findByIdOrThrow(UUID id) {
-        return documentRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Document not found: " + id));
+        fileStorageService.delete(document.getFilePath());
     }
 }

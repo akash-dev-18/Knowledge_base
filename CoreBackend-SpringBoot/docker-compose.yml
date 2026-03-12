@@ -1,0 +1,10 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: knowledge_base
+    environment:
+      POSTGRES_USER: akash
+      POSTGRES_PASSWORD: akash
+      POSTGRES_DB: akash
+    ports:
+      - "5432:5432"
