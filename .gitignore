@@ -1,60 +1,133 @@
 # ==========================================
-# Spring Boot — CoreBackend-SpringBoot
-# ==========================================
-CoreBackend-SpringBoot/target/
-CoreBackend-SpringBoot/uploads/
-CoreBackend-SpringBoot/src/main/resources/application.properties
-CoreBackend-SpringBoot/src/main/resources/application-prod.properties
-CoreBackend-SpringBoot/src/main/resources/application-dev.properties
-CoreBackend-SpringBoot/.mvn/wrapper/maven-wrapper.jar
-CoreBackend-SpringBoot/*.jar
-CoreBackend-SpringBoot/*.war
-
-# ==========================================
-# FastAPI — fastapi-ai-services
-# ==========================================
-fastapi-ai-services/.env
-fastapi-ai-services/__pycache__/
-fastapi-ai-services/**/__pycache__/
-fastapi-ai-services/**/*.pyc
-fastapi-ai-services/.venv/
-fastapi-ai-services/venv/
-fastapi-ai-services/uploads/
-
-# ==========================================
-# Frontend
-# ==========================================
-frontend/.env
-frontend/.env.local
-frontend/.env.production
-frontend/node_modules/
-frontend/.next/
-frontend/out/
-
-# ==========================================
-# Root level
-# ==========================================
-.env
-test.sh
-test2.sh
-
-# ==========================================
-# IDE
-# ==========================================
-.idea/
-.vscode/
-*.iml
-*.iws
-*.ipr
-
-# ==========================================
-# OS
+# OS generated files
 # ==========================================
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
 Thumbs.db
 
 # ==========================================
-# Logs
+# IDEs and Editors
+# ==========================================
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+*.iml
+*.iws
+*.ipr
+.project
+.classpath
+.settings/
+.springBeans
+
+# ==========================================
+# Java & Spring Boot (CoreBackend-SpringBoot)
+# ==========================================
+target/
+*.class
+*.jar
+*.war
+*.ear
+*.nar
+.mvn/wrapper/maven-wrapper.jar
+!/.mvn/wrapper/maven-wrapper.properties
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+
+# Spring Boot specific env files
+CoreBackend-SpringBoot/src/main/resources/application.properties
+CoreBackend-SpringBoot/src/main/resources/application-*.properties
+CoreBackend-SpringBoot/src/main/resources/application-*.yml
+CoreBackend-SpringBoot/src/main/resources/application-*.yaml
+
+# ==========================================
+# Python & FastAPI (fastapi-ai-services)
+# ==========================================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.env/
+.venv/
+ENV/
+*.egg-info/
+.eggs/
+.pytest_cache/
+.coverage
+htmlcov/
+.ipynb_checkpoints/
+pip-log.txt
+pip-delete-this-directory.txt
+
+# ==========================================
+# Node.js & Next.js (Frontend)
+# ==========================================
+node_modules/
+.pnp
+.pnp.js
+.pnp.cjs
+.next/
+out/
+build/
+dist/
+coverage/
+.npm
+.yarn/
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
+
+# ==========================================
+# Logs and Databases
 # ==========================================
 *.log
 logs/
+*.sqlite
+*.sqlite3
+*.db
+
+# ==========================================
+# Environment Variables & Secrets
+# ==========================================
+.env
+.env.*
+!.env.example
+!.env.template
+*.pem
+*.key
+*.cert
+*.crt
+# Specifically ensuring frontend envs are ignored
+frontend/.env.local
+frontend/.env.development.local
+frontend/.env.test.local
+frontend/.env.production.local
+
+# ==========================================
+# Uploads & Media (Project specific)
+# ==========================================
+uploads/
+CoreBackend-SpringBoot/uploads/
+fastapi-ai-services/uploads/
+
+# ==========================================
+# Test Scripts
+# ==========================================
+test.sh
+test2.sh

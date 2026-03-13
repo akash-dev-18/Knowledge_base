@@ -1,34 +1,40 @@
-# 🧠 KnowledgeBase AI
+<div align="center">
+  <h1>🧠 KnowledgeBase AI</h1>
+  <p><strong>A production-grade microservices-based multi-tenant SaaS platform that lets teams upload documents and chat with them using AI.</strong></p>
 
-> A production-grade **microservices-based** multi-tenant SaaS platform that lets teams upload documents and chat with them using AI — two independently deployable services communicating over REST.
-
-![Architecture](https://img.shields.io/badge/Architecture-Microservices-blueviolet?style=flat-square)
-![Java](https://img.shields.io/badge/Java-17-orange?style=flat-square&logo=java)
-![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.x-brightgreen?style=flat-square&logo=springboot)
-![FastAPI](https://img.shields.io/badge/FastAPI-0.100+-009688?style=flat-square&logo=fastapi)
-![Next.js](https://img.shields.io/badge/Next.js-14-black?style=flat-square&logo=nextdotjs)
-![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Neon-blue?style=flat-square&logo=postgresql)
-![Qdrant](https://img.shields.io/badge/Qdrant-Vector%20DB-red?style=flat-square)
-![Redis](https://img.shields.io/badge/Redis-Cloud-red?style=flat-square&logo=redis)
-![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?style=flat-square&logo=docker)
+  <!-- Badges -->
+  <p>
+    <img src="https://img.shields.io/badge/Architecture-Microservices-blueviolet?style=for-the-badge" alt="Architecture" />
+    <img src="https://img.shields.io/badge/Java-17-orange?style=for-the-badge&logo=java" alt="Java" />
+    <img src="https://img.shields.io/badge/Spring%20Boot-3.x-brightgreen?style=for-the-badge&logo=springboot" alt="Spring Boot" />
+    <img src="https://img.shields.io/badge/FastAPI-0.100+-009688?style=for-the-badge&logo=fastapi" alt="FastAPI" />
+    <img src="https://img.shields.io/badge/Next.js-14-black?style=for-the-badge&logo=nextdotjs" alt="Next.js" />
+    <br/>
+    <img src="https://img.shields.io/badge/PostgreSQL-Neon-blue?style=for-the-badge&logo=postgresql" alt="PostgreSQL" />
+    <img src="https://img.shields.io/badge/Qdrant-Vector%20DB-red?style=for-the-badge" alt="Qdrant" />
+    <img src="https://img.shields.io/badge/Redis-Cloud-red?style=for-the-badge&logo=redis" alt="Redis" />
+    <img src="https://img.shields.io/badge/Docker-Compose-2496ED?style=for-the-badge&logo=docker" alt="Docker" />
+  </p>
+</div>
 
 ---
 
 ## 📌 What is this?
 
-KnowledgeBase AI is a **multi-tenant document intelligence platform** where companies can:
-
-- Register their organization and invite team members
-- Create workspaces to organize documents
-- Upload PDFs/text files and **chat with them using AI**
-- Get automatic summaries, key points, and Q&A from documents
-- Control access with role-based permissions (Owner, Admin, Member, Viewer)
+**KnowledgeBase AI** is a highly scalable, **multi-tenant document intelligence platform** designed for modern teams. Companies can:
+- **🏢 Register Organizations:** Create dynamic workspaces and invite team members.
+- **📁 Organize Documents:** Securely upload PDFs/text files into dedicated workspaces.
+- **🤖 Chat with Data:** Use Advanced Contextual AI (RAG) to chat with documents.
+- **⚡ Get Instant Insights:** Leverage automatic summaries, key points extraction, and intelligent Q&A generation.
+- **🛡️ Secure Access:** Control data visibility with strict role-based access control (Owner, Admin, Member, Viewer).
 
 ---
 
-## 🏗️ Architecture
+## 🏗️ Architecture Design
 
-```
+Our platform leverages a **Microservices Architecture** to ensure independent scalability and fault tolerance.
+
+```text
 ┌─────────────────────────────────────────────────────────────┐
 │                        Next.js Frontend                      │
 │                    (TypeScript + Tailwind)                   │
@@ -40,18 +46,17 @@ KnowledgeBase AI is a **multi-tenant document intelligence platform** where comp
 │   Spring Boot API    │    │      FastAPI Service     │
 │   (Port 8080)        │    │      (Port 8000)         │
 │                      │    │                          │
-│  • Auth & JWT        │    │  • PDF Processing        │
-│  • User Management   │    │  • Text Chunking         │
-│  • Company/Workspace │    │  • Embeddings (OpenAI)   │
-│  • Document CRUD     │───▶│  • Vector Search         │
-│  • Role-based Access │    │  • AI Chat (Streaming)   │
-│                      │    │  • Summary & Key Points  │
+│  • Auth & Security   │    │  • Document Parsing      │
+│  • User Management   │    │  • Intelligent Chunking  │
+│  • Organization Logic│    │  • OpenAI Embeddings     │
+│  • Document Metadata │───▶│  • Semantic Vector Search│
+│  • RBAC & Permissions│    │  • Streaming AI Chat     │
 └──────────┬───────────┘    └────────────┬────────────┘
            │                             │
      ┌─────┴──────┐              ┌───────┴──────┐
      │ PostgreSQL  │              │    Qdrant    │
      │  (NeonDB)   │              │  Vector DB   │
-     └─────────────┘              └──────────────┘
+     └─────────────┘              └──────┬───────┘
                                          │
                                   ┌──────┴──────┐
                                   │    Redis    │
@@ -61,317 +66,173 @@ KnowledgeBase AI is a **multi-tenant document intelligence platform** where comp
 
 ---
 
-## 🧩 Microservices Design
+## ✨ Key Features & Capabilities
 
-This project is split into **2 independently deployable services** — each with its own tech stack, database, and responsibility:
+### 🔐 Multi-tenancy & Security
+- **JWT-based Authentication** with secure token validation.
+- **Data Isolation:** Every company gets strictly isolated data via tenant IDs.
+- **Role-based Access Control (RBAC):** Hierarchical permissions (Owner → Admin → Member → Viewer).
 
-| Service                  | Tech                   | Responsibility                                       |
-| ------------------------ | ---------------------- | ---------------------------------------------------- |
-| `CoreBackend-SpringBoot` | Java 17, Spring Boot 3 | Auth, users, companies, workspaces, document CRUD    |
-| `fastapi-ai-services`    | Python, FastAPI        | Document processing, embeddings, RAG chat, streaming |
-
-Each service can be **scaled, deployed, and updated independently**. Spring Boot calls FastAPI over internal REST when a document is uploaded or deleted.
-
-### 🔐 Authentication & Multi-tenancy
-
-- JWT-based authentication with secure token handling
-- Company registration — every company gets its own isolated data
-- Role-based access control: **Owner → Admin → Member → Viewer**
-- Invite team members directly into your company
-
-### 📁 Workspace Management
-
-- Create multiple workspaces per company
-- Add/remove members with specific roles
-- Full CRUD with authorization checks
-
-### 📄 Document Intelligence
-
-- Upload PDF and TXT files
-- Documents automatically processed and indexed into vector DB
-- Real-time status tracking: `UPLOADING → READY → INDEXED`
-
-### 🤖 AI Chat (RAG Pipeline)
-
-- **Chat with your documents** — ask anything, get context-aware answers
-- **Streaming responses** — word-by-word output like ChatGPT
-- **Auto Summary** — comprehensive document summary in seconds
-- **Key Points Extraction** — bullet points of the most important info
-- **Q&A Generation** — auto-generate question-answer pairs from documents
-- **Chat History** — conversation context maintained via Redis
-- **Multi-document support** — chat across different documents
-
-### 👥 Team Management
-
-- View all company members
-- Update roles, suspend users
-- Only Owners can delete the company or invite new members
+### 🤖 Advanced AI Document Chat (RAG Pipeline)
+- **Chat Contextually:** Ask anything and get hyper-relevant, context-aware answers.
+- **Streaming Responses:** Real-time word-by-word generation for a smooth ChatGPT-like UX.
+- **Auto-Summarization:** Instantly digest large documents with accurate AI summaries.
+- **Multi-document Analysis:** Interrogate multiple documents simultaneously in a single chat.
+- **Smart Q&A Generation:** Automatically generates potential test/interview questions based on the document text.
 
 ---
 
-## 🛠️ Tech Stack
+## 🛠️ Technology Stack Overview
 
-### Backend — Spring Boot Service
+**Backend — Spring Boot Service**
+- **Core:** Java 17, Spring Boot 3.x
+- **Security:** Spring Security + JWT
+- **Data:** PostgreSQL ( NeonDB ) via Spring Data JPA + Hibernate
+- **Utilities:** Lombok, RestClient
 
-| Technology                  | Purpose                               |
-| --------------------------- | ------------------------------------- |
-| Java 17 + Spring Boot 3.x   | Core API framework                    |
-| Spring Security + JWT       | Authentication & authorization        |
-| Spring Data JPA + Hibernate | ORM & database access                 |
-| PostgreSQL (NeonDB)         | Primary database                      |
-| Lombok                      | Boilerplate reduction                 |
-| RestClient                  | HTTP client for FastAPI communication |
+**AI Service — FastAPI**
+- **Core:** Python 3.10+, FastAPI (Async)
+- **AI & RAG:** LangChain, OpenRouter API (Access to 100+ LLMs)
+- **Data Stores:** Qdrant (Vector DB), Redis Cloud (Session & Memory)
+- **Document Processing:** PyPDF2
+- **Real-time:** Server-Sent Events (SSE) for streaming
 
-### AI Service — FastAPI
-
-| Technology         | Purpose                           |
-| ------------------ | --------------------------------- |
-| Python + FastAPI   | Async AI microservice             |
-| LangChain          | LLM orchestration & RAG pipeline  |
-| OpenRouter API     | LLM access (100+ models)          |
-| Qdrant             | Vector database for embeddings    |
-| Redis Cloud        | Chat history & session management |
-| PyPDF2             | PDF text extraction               |
-| Server-Sent Events | Streaming AI responses            |
-
-### Frontend — Next.js
-
-| Technology               | Purpose                 |
-| ------------------------ | ----------------------- |
-| Next.js 14 (App Router)  | React framework         |
-| TypeScript               | Type safety             |
-| Tailwind CSS + shadcn/ui | UI components           |
-| Zustand                  | Global state management |
-| TanStack Query           | API calls & caching     |
+**Frontend — Next.js**
+- **Core:** Next.js 14 (App Router), TypeScript
+- **Styling:** Tailwind CSS, shadcn/ui components
+- **State Management:** Zustand, TanStack Query
 
 ---
 
-## 🗂️ Project Structure
+## 🚀 Getting Started Guide
 
-```
-knowledgebase-ai/
-│
-├── CoreBackend-SpringBoot/          # Spring Boot Service
-│   └── src/main/java/com/springboot/backend/
-│       ├── controller/              # REST controllers
-│       ├── service/                 # Business logic
-│       ├── repository/              # JPA repositories
-│       ├── entity/                  # JPA entities
-│       ├── dto/                     # Request/Response DTOs
-│       ├── mapper/                  # Entity ↔ DTO mappers
-│       ├── filter/                  # JWT filter
-│       ├── config/                  # Security config
-│       └── util/                    # SecurityUtils
-│
-├── fastapi-ai-services/             # FastAPI AI Service
-│   └── app/
-│       ├── core/                    # Config & settings
-│       ├── services/
-│       │   ├── document_service.py  # PDF processing & chunking
-│       │   ├── vector_service.py    # Qdrant operations
-│       │   └── chat_service.py      # RAG chat + streaming
-│       └── routes/
-│           ├── document.py          # Document endpoints
-│           └── chat.py              # Chat endpoints
-│
-└── frontend/                        # Next.js Frontend
-    └── app/
-        ├── (auth)/                  # Login & Register
-        ├── dashboard/               # Main dashboard
-        ├── workspaces/              # Workspace management
-        └── documents/               # Document chat UI
-```
-
----
-
-## 🚀 Getting Started
+<details>
+<summary><strong>Click to expand prerequisites and setup instructions</strong></summary>
 
 ### Prerequisites
+- Java 17+, Python 3.10+, Node.js 18+
+- PostgreSQL Server / NeonDB Account
+- Qdrant Cloud Cluster
+- Redis Cloud Account
+- OpenRouter API Key
 
-- Java 17+
-- Python 3.10+
-- Node.js 18+
-- PostgreSQL (or NeonDB account)
-- Qdrant Cloud account
-- Redis Cloud account
-- OpenRouter API key
-
-### 1. Clone the repository
-
-```bash
-git clone https://github.com/yourusername/knowledgebase-ai.git
-cd knowledgebase-ai
-```
-
-### 2. Spring Boot Setup
-
+### 1. Spring Boot Setup
 ```bash
 cd CoreBackend-SpringBoot
 ```
-
-Create `src/main/resources/application.properties`:
-
+Configure `src/main/resources/application.properties`:
 ```properties
 spring.datasource.url=jdbc:postgresql://your-neon-host/neondb?sslmode=require
 spring.datasource.username=your_username
 spring.datasource.password=your_password
-
 spring.jpa.hibernate.ddl-auto=update
-spring.jpa.show-sql=false
-
 app.jwt.secret=your-256-bit-secret-key-minimum-32-characters
 app.jwt.expiry=86400000
-
 fastapi.url=http://localhost:8000
 file.upload.dir=uploads/
 ```
-
+Run the application:
 ```bash
 ./mvnw spring-boot:run
 ```
 
-### 3. FastAPI Setup
-
+### 2. FastAPI Setup
 ```bash
 cd fastapi-ai-services
 pip install -r requirements.txt
 ```
-
-Create `.env`:
-
+Configure `.env`:
 ```env
 OPENROUTER_API_KEY=your-openrouter-key
 OPENROUTER_BASE_URL=https://openrouter.ai/api/v1
 LLM_MODEL=mistralai/mistral-7b-instruct
-
 QDRANT_URL=your-qdrant-cloud-url
 QDRANT_API_KEY=your-qdrant-api-key
 QDRANT_COLLECTION=documents
-
 REDIS_URL=redis://:password@host:port
 ```
-
+Run the service:
 ```bash
 uvicorn app.main:app --reload --port 8000
 ```
 
-### 4. Frontend Setup
-
+### 3. Frontend Setup
 ```bash
 cd frontend
 npm install
 ```
-
-Create `.env.local`:
-
+Configure `.env.local`:
 ```env
 NEXT_PUBLIC_SPRING_URL=http://localhost:8080
 NEXT_PUBLIC_FASTAPI_URL=http://localhost:8000
 ```
-
+Run the development server:
 ```bash
 npm run dev
 ```
+</details>
 
 ---
 
-## 📡 API Reference
+## 🧬 Data Flow & Database Schema
 
-### Spring Boot — `http://localhost:8080`
-
-| Method | Endpoint                        | Description              | Auth           |
-| ------ | ------------------------------- | ------------------------ | -------------- |
-| POST   | `/api/auth/register`            | Register company + owner | ❌             |
-| POST   | `/api/auth/login`               | Login                    | ❌             |
-| POST   | `/api/auth/invite`              | Invite team member       | ✅ Owner       |
-| GET    | `/api/users/me`                 | Get current user         | ✅             |
-| GET    | `/api/users`                    | Get all company users    | ✅             |
-| PATCH  | `/api/users/me`                 | Update profile           | ✅             |
-| GET    | `/api/companies/{id}`           | Get company details      | ✅             |
-| PATCH  | `/api/companies/{id}`           | Update company           | ✅ Owner/Admin |
-| POST   | `/api/workspaces`               | Create workspace         | ✅ Owner/Admin |
-| GET    | `/api/workspaces`               | List workspaces          | ✅             |
-| POST   | `/api/workspaces/{id}/members`  | Add member               | ✅ Owner/Admin |
-| POST   | `/api/documents`                | Upload document          | ✅             |
-| GET    | `/api/documents/workspace/{id}` | List documents           | ✅             |
-| DELETE | `/api/documents/{id}`           | Delete document          | ✅             |
-
-### FastAPI — `http://localhost:8000`
-
-| Method | Endpoint                    | Description                    |
-| ------ | --------------------------- | ------------------------------ |
-| POST   | `/documents/process/{id}`   | Process & embed document       |
-| POST   | `/chat/`                    | Chat with document (invoke)    |
-| POST   | `/chat/stream`              | Chat with document (streaming) |
-| POST   | `/chat/summary`             | Generate document summary      |
-| POST   | `/chat/key-points`          | Extract key points             |
-| POST   | `/chat/generate-questions`  | Generate Q&A pairs             |
-| DELETE | `/chat/history/{sessionId}` | Clear chat history             |
-
----
-
-## 🔑 Role Permissions
-
-| Action                | Owner | Admin | Member | Viewer |
-| --------------------- | ----- | ----- | ------ | ------ |
-| Company update        | ✅    | ✅    | ❌     | ❌     |
-| Company delete        | ✅    | ❌    | ❌     | ❌     |
-| Invite members        | ✅    | ❌    | ❌     | ❌     |
-| Create workspace      | ✅    | ✅    | ❌     | ❌     |
-| Add workspace members | ✅    | ✅    | ❌     | ❌     |
-| Upload documents      | ✅    | ✅    | ✅     | ❌     |
-| Delete documents      | ✅    | ✅    | ✅     | ❌     |
-| Chat with documents   | ✅    | ✅    | ✅     | ✅     |
-| View everything       | ✅    | ✅    | ✅     | ✅     |
-
----
-
-## 🧬 Database Schema
-
-```
-Company ──< Role
-   │
-   └──< User >── WorkspaceUser >── Workspace ──< Document
+### Entity Relationship Model
+```mermaid
+erDiagram
+    COMPANY ||--o{ ROLE : has
+    COMPANY ||--o{ USER : employs
+    USER ||--o{ WORKSPACE_USER : joins
+    WORKSPACE ||--o{ WORKSPACE_USER : contains
+    COMPANY ||--o{ WORKSPACE : owns
+    WORKSPACE ||--o{ DOCUMENT : stores
 ```
 
-**Key entities:** `Company`, `Role`, `User`, `Workspace`, `WorkspaceUser`, `Document`
-
-All entities extend `BaseEntity` with `UUID` primary key, `createdAt`, `updatedAt` via JPA Auditing.
-
----
-
-## 🤖 RAG Pipeline
-
-```
-PDF Upload
-    │
-    ▼
-Text Extraction (PyPDF2)
-    │
-    ▼
-Text Chunking (500 chars, 50 overlap)
-    │
-    ▼
-Embedding Generation (OpenAI ada-002 via OpenRouter)
-    │
-    ▼
-Vector Storage (Qdrant Cloud)
-    │
-    ▼
-User Question ──► Semantic Search ──► Top-K Chunks ──► LLM ──► Streaming Answer
-                                                          ▲
-                                                     Chat History
-                                                       (Redis)
-```
-
-## 📝 License
-
-MIT License — feel free to use this project for learning or as a base for your own SaaS.
+### RAG Data Pipeline
+1. **Document Upload:** PDF parsed via PyPDF2.
+2. **Chunking Engine:** Text divided into 500-character chunks with 50-character overlaps.
+3. **Embeddings:** Vectorized using OpenRouter APIs.
+4. **Vector Storage:** Embeddings pushed to Qdrant Cloud.
+5. **Retrieval Search:** User queries fetch top-K chunks via Cosine Similarity.
+6. **LLM Generation:** Relevant chunks injected into LangChain prompts to stream intelligent responses.
 
 ---
 
-## 👨‍💻 Author
+## 📡 API Endpoints Reference
 
-Built with ❤️ as a full-stack microservices learning project.
+<details>
+<summary><strong>Spring Boot APIs (Port 8080)</strong></summary>
 
-> **Spring Boot** + **FastAPI** + **Next.js** + **LangChain** + **Qdrant** + **Redis** — all wired together into one production-grade platform.
+| Method | Endpoint | Description | Auth |
+|---|---|---|---|
+| `POST` | `/api/auth/register` | Register company + owner | Public |
+| `POST` | `/api/auth/login` | Login | Public |
+| `POST` | `/api/auth/invite` | Invite team member | Owner |
+| `GET` | `/api/users/me` | Get current user | Valid JWT |
+| `GET` | `/api/companies/{id}` | Get company details | Valid JWT |
+| `POST` | `/api/workspaces` | Create workspace | Owner/Admin |
+| `POST` | `/api/documents` | Upload document | Valid JWT |
+| `GET` | `/api/documents/workspace/{id}` | List documents | Valid JWT |
+
+</details>
+
+<details>
+<summary><strong>FastAPI Services (Port 8000)</strong></summary>
+
+| Method | Endpoint | Description |
+|---|---|---|
+| `POST` | `/documents/process/{id}` | Process & embed document |
+| `POST` | `/chat/` | Chat with document (synchronous) |
+| `POST` | `/chat/stream` | Chat with document (streaming SSE) |
+| `POST` | `/chat/summary` | Generate document summary |
+| `POST` | `/chat/key-points` | Extract key points |
+| `DELETE`| `/chat/history/{sessionId}` | Clear session memory |
+
+</details>
+
+---
+
+<div align="center">
+  <p><strong>Built with ❤️ as a full-stack microservices initiative.</strong></p>
+  <p>Spring Boot • FastAPI • Next.js • LangChain • Qdrant • Redis</p>
+  <p>MIT License</p>
+</div>
