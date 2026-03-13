@@ -1,7 +1,8 @@
 # 🧠 KnowledgeBase AI
 
-> A production-grade multi-tenant SaaS platform that lets teams upload documents and chat with them using AI — built with a microservices architecture.
+> A production-grade **microservices-based** multi-tenant SaaS platform that lets teams upload documents and chat with them using AI — two independently deployable services communicating over REST.
 
+![Architecture](https://img.shields.io/badge/Architecture-Microservices-blueviolet?style=flat-square)
 ![Java](https://img.shields.io/badge/Java-17-orange?style=flat-square&logo=java)
 ![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.x-brightgreen?style=flat-square&logo=springboot)
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.100+-009688?style=flat-square&logo=fastapi)
@@ -9,6 +10,7 @@
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Neon-blue?style=flat-square&logo=postgresql)
 ![Qdrant](https://img.shields.io/badge/Qdrant-Vector%20DB-red?style=flat-square)
 ![Redis](https://img.shields.io/badge/Redis-Cloud-red?style=flat-square&logo=redis)
+![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?style=flat-square&logo=docker)
 
 ---
 
@@ -59,28 +61,37 @@ KnowledgeBase AI is a **multi-tenant document intelligence platform** where comp
 
 ---
 
-## Features
+## 🧩 Microservices Design
 
-### Authentication & Multi-tenancy
+This project is split into **2 independently deployable services** — each with its own tech stack, database, and responsibility:
+
+| Service                  | Tech                   | Responsibility                                       |
+| ------------------------ | ---------------------- | ---------------------------------------------------- |
+| `CoreBackend-SpringBoot` | Java 17, Spring Boot 3 | Auth, users, companies, workspaces, document CRUD    |
+| `fastapi-ai-services`    | Python, FastAPI        | Document processing, embeddings, RAG chat, streaming |
+
+Each service can be **scaled, deployed, and updated independently**. Spring Boot calls FastAPI over internal REST when a document is uploaded or deleted.
+
+### 🔐 Authentication & Multi-tenancy
 
 - JWT-based authentication with secure token handling
 - Company registration — every company gets its own isolated data
 - Role-based access control: **Owner → Admin → Member → Viewer**
 - Invite team members directly into your company
 
-### Workspace Management
+### 📁 Workspace Management
 
 - Create multiple workspaces per company
 - Add/remove members with specific roles
 - Full CRUD with authorization checks
 
-### Document Intelligence
+### 📄 Document Intelligence
 
 - Upload PDF and TXT files
 - Documents automatically processed and indexed into vector DB
 - Real-time status tracking: `UPLOADING → READY → INDEXED`
 
-### AI Chat (RAG Pipeline)
+### 🤖 AI Chat (RAG Pipeline)
 
 - **Chat with your documents** — ask anything, get context-aware answers
 - **Streaming responses** — word-by-word output like ChatGPT
@@ -90,7 +101,7 @@ KnowledgeBase AI is a **multi-tenant document intelligence platform** where comp
 - **Chat History** — conversation context maintained via Redis
 - **Multi-document support** — chat across different documents
 
-### Team Management
+### 👥 Team Management
 
 - View all company members
 - Update roles, suspend users
@@ -98,7 +109,7 @@ KnowledgeBase AI is a **multi-tenant document intelligence platform** where comp
 
 ---
 
-## Tech Stack
+## 🛠️ Tech Stack
 
 ### Backend — Spring Boot Service
 
@@ -152,7 +163,7 @@ knowledgebase-ai/
 │       ├── config/                  # Security config
 │       └── util/                    # SecurityUtils
 │
-├── fastapi-service/                 # FastAPI AI Service
+├── fastapi-ai-services/             # FastAPI AI Service
 │   └── app/
 │       ├── core/                    # Config & settings
 │       ├── services/
@@ -173,7 +184,7 @@ knowledgebase-ai/
 
 ---
 
-## Getting Started
+## 🚀 Getting Started
 
 ### Prerequisites
 
@@ -222,7 +233,7 @@ file.upload.dir=uploads/
 ### 3. FastAPI Setup
 
 ```bash
-cd fastapi-service
+cd fastapi-ai-services
 pip install -r requirements.txt
 ```
 
@@ -264,7 +275,7 @@ npm run dev
 
 ---
 
-## API Reference
+## 📡 API Reference
 
 ### Spring Boot — `http://localhost:8080`
 
@@ -315,7 +326,7 @@ npm run dev
 
 ---
 
-## Database Schema
+## 🧬 Database Schema
 
 ```
 Company ──< Role
@@ -329,7 +340,7 @@ All entities extend `BaseEntity` with `UUID` primary key, `createdAt`, `updatedA
 
 ---
 
-## RAG Pipeline
+## 🤖 RAG Pipeline
 
 ```
 PDF Upload
@@ -353,13 +364,13 @@ User Question ──► Semantic Search ──► Top-K Chunks ──► LLM ─
                                                        (Redis)
 ```
 
-## License
+## 📝 License
 
 MIT License — feel free to use this project for learning or as a base for your own SaaS.
 
 ---
 
-## Author
+## 👨‍💻 Author
 
 Built with ❤️ as a full-stack microservices learning project.
 

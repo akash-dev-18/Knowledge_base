@@ -10,15 +10,21 @@ from qdrant_client.models import (
     PayloadSchemaType,
 )
 from langchain_openai import OpenAIEmbeddings
+from langchain_google_genai import GoogleGenerativeAIEmbeddings
 from app.core.config import settings
 import uuid
 
 client = QdrantClient(url=settings.QDRANT_URL, api_key=settings.QDRANT_API_KEY)
 
-embeddings = OpenAIEmbeddings(
-    openai_api_key=settings.OPENROUTER_API_KEY,
-    openai_api_base=settings.OPENROUTER_BASE_URL,
-    model="text-embedding-ada-002",
+#  embeddings = OpenAIEmbeddings(
+#      openai_api_key=settings.OPENROUTER_API_KEY,
+#    openai_api_base=settings.OPENROUTER_BASE_URL,
+#      model="openai/text-embedding-3-small",
+#  )
+
+embeddings = GoogleGenerativeAIEmbeddings(
+    model="models/gemini-embedding-001",
+    google_api_key=settings.GOOGLE_API_KEY
 )
 
 
@@ -26,7 +32,7 @@ def ensure_collection():
     if not client.collection_exists(settings.QDRANT_COLLECTION):
         client.create_collection(
             collection_name=settings.QDRANT_COLLECTION,
-            vectors_config=VectorParams(size=1536, distance=Distance.COSINE),
+            vectors_config=VectorParams(size=3072, distance=Distance.COSINE),
         )
         client.create_payload_index(
             collection_name=settings.QDRANT_COLLECTION,

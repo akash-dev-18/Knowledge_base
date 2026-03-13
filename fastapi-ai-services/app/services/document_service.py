@@ -1,8 +1,11 @@
 import PyPDF2
 import io
 from app.services.vector_service import store_chunks, delete_document_chunks
+import logging
+import traceback
 
 
+logger=logging.getLogger(__name__)
 def extract_text_from_pdf(file_bytes: bytes) -> str:
     pdf_reader = PyPDF2.PdfReader(io.BytesIO(file_bytes))
     text = ""
@@ -30,6 +33,7 @@ def chunk_text(text: str, chunk_size: int = 500, overlap: int = 50) -> list[str]
 
 
 def process_document(file_bytes: bytes, filename: str, document_id: str):
+    
     if filename.endswith(".pdf"):
         text = extract_text_from_pdf(file_bytes)
     elif filename.endswith(".txt"):

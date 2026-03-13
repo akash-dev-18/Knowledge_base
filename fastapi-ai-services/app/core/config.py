@@ -2,11 +2,9 @@ from pydantic_settings import SettingsConfigDict, BaseSettings
 
 
 class Settings(BaseSettings):
-    OPENROUTER_API_KEY: str
-    OPENROUTER_BASE_URL: str
     LLM_MODEL: str
 
-    OLLAMA_BASE_URL: str
+    GOOGLE_API_KEY:str
 
 
     QDRANT_URL: str

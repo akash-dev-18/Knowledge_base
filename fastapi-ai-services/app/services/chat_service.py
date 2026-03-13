@@ -6,6 +6,7 @@ from langchain_core.messages import HumanMessage, AIMessage, SystemMessage
 from app.services.vector_service import search_chunks
 from app.core.config import settings
 from langchain_ollama import ChatOllama
+from langchain_google_genai import ChatGoogleGenerativeAI
 from typing import AsyncGenerator
 
 logger = logging.getLogger(__name__)
@@ -25,18 +26,25 @@ except Exception:
     logger.warning("Redis unavailable – using in-memory chat history (not persistent)")
 
 
-llm = ChatOpenAI(
-    openai_api_key=settings.OPENROUTER_API_KEY,
-    openai_api_base=settings.OPENROUTER_BASE_URL,
-    model_name=settings.LLM_MODEL,
-    temperature=0.7,
-)
-
-# llm = ChatOllama(
-#     model=settings.LLM_MODEL,          
-#     base_url=settings.OLLAMA_BASE_URL,  
+# llm = ChatOpenAI(
+#    openai_api_key=settings.OPENROUTER_API_KEY,
+#    openai_api_base=settings.OPENROUTER_BASE_URL,
+#    model_name=settings.LLM_MODEL,
 #     temperature=0.7,
 # )
+
+# llm = ChatOllama(
+#      model=settings.LLM_MODEL,          
+#      base_url=settings.OLLAMA_BASE_URL,  
+#      temperature=0.7,
+# )
+
+llm=ChatGoogleGenerativeAI(
+    model="gemini-2.5-flash",
+    google_api_key=settings.GOOGLE_API_KEY,
+    temperature=0.7,
+)
+    
 
 
 class KeyPointsResponse(BaseModel):
