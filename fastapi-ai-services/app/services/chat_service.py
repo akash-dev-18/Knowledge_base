@@ -81,7 +81,7 @@ def get_chat_history(session_id: str) -> list:
 def save_chat_history(session_id: str, history: list):
     key = f"chat:{session_id}"
     if redis_client:
-        redis_client.setex(key, 3600, json.dumps(history))
+        redis_client.setex(key, 604800, json.dumps(history))
     else:
         _memory_store[key] = history
 

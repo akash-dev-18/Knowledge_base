@@ -422,6 +422,15 @@ const api = {
       throw err
     }
   },
+  getChatHistory: async (sessionId: string) => {
+    try {
+      return await request<{ session_id: string; history: { role: string; content: string }[] }>(
+        FASTAPI_BASE, `/chat/history/${sessionId}`
+      )
+    } catch {
+      return { session_id: sessionId, history: [] }
+    }
+  },
   clearHistory: (sessionId: string) =>
     request<void>(FASTAPI_BASE, `/chat/history/${sessionId}`, {
       method: 'DELETE',

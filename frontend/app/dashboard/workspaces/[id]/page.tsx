@@ -80,9 +80,7 @@ export default function WorkspaceDetailPage() {
   const [uploading, setUploading] = useState(false)
   const [uploadProgress, setUploadProgress] = useState(0)
   const [addMemberOpen, setAddMemberOpen] = useState(false)
-  const [newMemberName, setNewMemberName] = useState('')
   const [newMemberEmail, setNewMemberEmail] = useState('')
-  const [newMemberPassword, setNewMemberPassword] = useState('')
   const [newMemberRole, setNewMemberRole] = useState('MEMBER')
   const [addMemberLoading, setAddMemberLoading] = useState(false)
   const [deleteDocId, setDeleteDocId] = useState<string | null>(null)
@@ -168,41 +166,24 @@ export default function WorkspaceDetailPage() {
     if (!newMemberEmail.trim() || !id) return
     setAddMemberLoading(true)
     try {
-      let targetUserId = ''
-
-      try {
-        // Attempt to invite them into the company first
-        const invitedUser = await api.inviteCandidate({
-          name: newMemberName,
-          email: newMemberEmail,
-          password: newMemberPassword,
-          roleName: newMemberRole,
-        })
-        targetUserId = invitedUser.id
-      } catch (err: any) {
-        // If they already exist, we silently snag their UUID from the system instead
-        if (err.message?.toLowerCase().includes('already exists')) {
-          const allUsers = await api.getUsers()
-          const existing = allUsers.find(u => u.email.toLowerCase() === newMemberEmail.toLowerCase())
-          if (!existing) throw new Error('User exists but could not be resolved')
-          targetUserId = existing.id
-        } else {
-          throw err
-        }
+      // Look up existing company member by email
+      const allUsers = await api.getUsers()
+      const existing = allUsers.find(u => u.email.toLowerCase() === newMemberEmail.trim().toLowerCase())
+      if (!existing) {
+        toast.error('No user found with this email. Invite them from the Team page first.')
+        return
       }
 
-      // Finally link the UUID into the workspace
+      // Assign them to this workspace with the selected role
       const member = await api.addWorkspaceMember(id, {
-        userId: targetUserId,
+        userId: existing.id,
         role: newMemberRole,
       })
-      
+
       setMembers((prev) => [...prev, member])
-      toast.success('Member assigned to workspace')
+      toast.success(`${existing.fullName} added to workspace`)
       setAddMemberOpen(false)
-      setNewMemberName('')
       setNewMemberEmail('')
-      setNewMemberPassword('')
       setNewMemberRole('MEMBER')
     } catch (err: any) {
       toast.error(err?.message || 'Failed to add member')
@@ -494,48 +475,27 @@ export default function WorkspaceDetailPage() {
       <Dialog open={addMemberOpen} onOpenChange={setAddMemberOpen}>
         <DialogContent className="sm:max-w-sm bg-card border-border">
           <DialogHeader>
-            <DialogTitle>Add Member</DialogTitle>
+            <DialogTitle>Add Member to Workspace</DialogTitle>
           </DialogHeader>
+          <p className="text-xs text-muted-foreground -mt-1">
+            Enter the email of an existing team member to assign them to this workspace.
+          </p>
           <form onSubmit={handleAddMember} className="flex flex-col gap-4 mt-2">
             <div className="flex flex-col gap-1.5">
-              <Label htmlFor="memberName">Full Name</Label>
+              <Label htmlFor="memberEmail">Email</Label>
               <Input
-                id="memberName"
-                placeholder="Alex Johnson"
-                value={newMemberName}
-                onChange={(e) => setNewMemberName(e.target.value)}
+                id="memberEmail"
+                type="email"
+                placeholder="member@company.com"
+                value={newMemberEmail}
+                onChange={(e) => setNewMemberEmail(e.target.value)}
                 className="bg-input border-border focus-visible:ring-primary"
                 required
                 autoFocus
               />
             </div>
             <div className="flex flex-col gap-1.5">
-              <Label htmlFor="memberEmail">Email</Label>
-              <Input
-                id="memberEmail"
-                type="email"
-                placeholder="alex@company.com"
-                value={newMemberEmail}
-                onChange={(e) => setNewMemberEmail(e.target.value)}
-                className="bg-input border-border focus-visible:ring-primary"
-                required
-              />
-            </div>
-            <div className="flex flex-col gap-1.5">
-              <Label htmlFor="memberPassword">Password (if new)</Label>
-              <Input
-                id="memberPassword"
-                type="password"
-                minLength={8}
-                value={newMemberPassword}
-                onChange={(e) => setNewMemberPassword(e.target.value)}
-                className="bg-input border-border focus-visible:ring-primary"
-                placeholder="••••••••"
-                required
-              />
-            </div>
-            <div className="flex flex-col gap-1.5">
-              <Label htmlFor="role">Role</Label>
+              <Label htmlFor="role">Workspace Role</Label>
               <Select value={newMemberRole} onValueChange={setNewMemberRole}>
                 <SelectTrigger id="role" className="bg-input border-border">
                   <SelectValue />
@@ -553,7 +513,7 @@ export default function WorkspaceDetailPage() {
               </Button>
               <Button type="submit" disabled={addMemberLoading} className="bg-primary hover:bg-primary/90 text-primary-foreground">
                 {addMemberLoading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
-                Add Member
+                Assign Member
               </Button>
             </div>
           </form>

@@ -15,6 +15,7 @@ import {
   Loader2,
   RefreshCcw,
 } from 'lucide-react'
+import { useAuthStore } from '@/lib/store'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import {
@@ -57,6 +58,7 @@ const SUGGESTED_QUESTIONS = [
 
 export default function DocumentChatPage() {
   const { id, docId } = useParams<{ id: string; docId: string }>()
+  const { user } = useAuthStore()
   const router = useRouter()
 
   const [doc, setDoc] = useState<DocType | null>(null)
@@ -74,7 +76,7 @@ export default function DocumentChatPage() {
 
   const bottomRef = useRef<HTMLDivElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
-  const sessionId = useRef(`session-${docId}-${Date.now()}`)
+  const sessionId = useRef(`session-${docId}-${user?.id ?? 'anon'}`)
 
   // Fetch document info
   useEffect(() => {
@@ -90,6 +92,32 @@ export default function DocumentChatPage() {
       }
     }
     fetchDoc()
+  }, [docId])
+
+  // Load existing chat history on mount
+  useEffect(() => {
+    async function loadHistory() {
+      if (!docId) return
+      try {
+        const res = await api.getChatHistory(sessionId.current)
+        if (res.history && res.history.length > 0) {
+          const restored: ChatMessage[] = []
+          for (const msg of res.history) {
+            restored.push({
+              id: `restored-${Date.now()}-${Math.random()}`,
+              role: msg.role === 'human' ? 'user' : 'assistant',
+              content: msg.content,
+              timestamp: new Date(),
+              isStreaming: false,
+            })
+          }
+          setMessages(restored)
+        }
+      } catch {
+        // Non-critical: if history can't be loaded, start fresh
+      }
+    }
+    loadHistory()
   }, [docId])
 
   useEffect(() => {
@@ -164,7 +192,7 @@ export default function DocumentChatPage() {
     }
     setMessages([])
     setIsLoading(false)
-    sessionId.current = `session-${docId}-${Date.now()}`
+    sessionId.current = `session-${docId}-${user?.id ?? 'anon'}`
     toast.success('Chat history cleared')
     setClearConfirm(false)
   }
@@ -265,7 +293,7 @@ export default function DocumentChatPage() {
       {/* Left Panel */}
       <aside className="w-72 flex flex-col gap-4 flex-shrink-0">
         <button
-          onClick={() => router.push(`/workspaces/${id}`)}
+          onClick={() => router.push(`/dashboard/workspaces/${id}`)}
           className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />

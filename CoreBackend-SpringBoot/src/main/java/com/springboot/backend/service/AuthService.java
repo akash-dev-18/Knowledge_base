@@ -87,7 +87,7 @@ public class AuthService {
     @Transactional
 public AuthResponse invite(InviteRequest request) {
     User currentUser = securityUtils.getCurrentUser();
-    securityUtils.requireRole("OWNER");
+    securityUtils.requireRole("OWNER", "ADMIN");
 
     if (userRepository.existsByEmail(request.getEmail())) {
         throw new RuntimeException("Email already exists");

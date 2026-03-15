@@ -6,7 +6,8 @@ from app.services.chat_service import (
     extract_key_points,
     generate_questions,
     clear_chat_history,
-    chat_with_document_stream
+    chat_with_document_stream,
+    get_chat_history,
 )
 
 router = APIRouter(prefix="/chat", tags=["chat"])
@@ -107,5 +108,14 @@ async def clear_history(session_id: str):
     try:
         clear_chat_history(session_id)
         return {"message": "Chat history cleared"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/history/{session_id}")
+async def fetch_history(session_id: str):
+    try:
+        history = get_chat_history(session_id)
+        return {"session_id": session_id, "history": history}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

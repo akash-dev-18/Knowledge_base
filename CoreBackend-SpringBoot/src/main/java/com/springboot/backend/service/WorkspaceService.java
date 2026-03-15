@@ -50,8 +50,7 @@ public class WorkspaceService {
                         .name(request.getName())
                         .description(request.getDescription())
                         .company(company)
-                        .build()
-        );
+                        .build());
 
         User creator = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found: " + userId));
@@ -63,31 +62,34 @@ public class WorkspaceService {
                         .workspace(workspace)
                         .user(creator)
                         .role(ownerRole)
-                        .build()
-        );
+                        .build());
 
         return workspaceMapper.toResponse(workspace);
     }
 
     public List<WorkspaceResponse> getAllForUser(User currentUser) {
         String roleName = currentUser.getRole().getName();
+        java.util.Map<UUID, Workspace> workspaceMap = new java.util.LinkedHashMap<>();
+
+        // OWNER/ADMIN see all company workspaces
         if ("OWNER".equals(roleName) || "ADMIN".equals(roleName)) {
-            return workspaceRepository.findByCompanyId(currentUser.getCompany().getId())
-                    .stream()
-                    .map(workspaceMapper::toResponse)
-                    .toList();
-        } else {
-            return workspaceUserRepository.findByUserId(currentUser.getId())
-                    .stream()
-                    .map(WorkspaceUser::getWorkspace)
-                    .map(workspaceMapper::toResponse)
-                    .toList();
+            workspaceRepository.findByCompanyId(currentUser.getCompany().getId())
+                    .forEach(w -> workspaceMap.put(w.getId(), w));
         }
+
+        // All users see workspaces they were explicitly added to
+        workspaceUserRepository.findByUserId(currentUser.getId())
+                .forEach(wu -> workspaceMap.putIfAbsent(wu.getWorkspace().getId(), wu.getWorkspace()));
+
+        return workspaceMap.values().stream()
+                .map(workspaceMapper::toResponse)
+                .toList();
     }
 
     public WorkspaceResponse getById(UUID id) {
         User currentUser = securityUtils.getCurrentUser();
         String roleName = currentUser.getRole().getName();
+        // Non-OWNER/ADMIN must be explicitly added to the workspace
         if (!"OWNER".equals(roleName) && !"ADMIN".equals(roleName)) {
             if (!workspaceUserRepository.existsByUserIdAndWorkspaceId(currentUser.getId(), id)) {
                 throw new RuntimeException("Access denied to this workspace");
@@ -137,7 +139,6 @@ public class WorkspaceService {
         User user = userRepository.findById(request.getUserId())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-
         Role role = roleService.findByNameAndCompanyOrThrow(String.valueOf(request.getRoleName()), companyId);
 
         WorkspaceUser member = workspaceUserRepository.save(
@@ -145,8 +146,7 @@ public class WorkspaceService {
                         .workspace(workspace)
                         .user(user)
                         .role(role)
-                        .build()
-        );
+                        .build());
 
         return workspaceUserMapper.toResponse(member);
     }
@@ -179,8 +179,6 @@ public class WorkspaceService {
         return workspaceRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Workspace not found: " + id));
     }
-
-
 
     @Transactional
     public WorkspaceUserResponse updateMemberRole(
