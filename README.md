@@ -69,7 +69,7 @@ Teams waste hours manually searching through PDFs, reports, and documentation. K
 ## Demo video(For watching full demo click on video"
 <p align="center">
   <a href="https://drive.google.com/file/d/1mpO5ZLAqs2Kk1X_PVVoyYolsJrJCsRlT/view?usp=sharing">
-    <img src="demo/demo.gif" alt="Video Demo">
+    <img src="demo_Video/demo.gif" alt="Video Demo">
   </a>
 </p>
 
