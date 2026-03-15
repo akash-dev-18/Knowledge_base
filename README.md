@@ -26,6 +26,8 @@
 
 ---
 
+
+
 ## 🎯 Project Overview
 
 **KnowledgeBase AI** is a **production-ready, multi-tenant SaaS platform** built with a microservices architecture that enables organizations to transform their static documents into interactive knowledge bases powered by AI.
@@ -63,6 +65,14 @@ Teams waste hours manually searching through PDFs, reports, and documentation. K
 </div>
 
 ---
+
+## Demo video
+
+<p align="center">
+  <a href="https://drive.google.com/file/d/1mpO5ZLAqs2Kk1X_PVVoyYolsJrJCsRlT/view?usp=sharing">
+    <img src="images/dashboard.png" alt="Video Demo">
+  </a>
+</p>
 
 ## 🏗️ Architecture
 
